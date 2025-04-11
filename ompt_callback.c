@@ -95,6 +95,9 @@ static ompt_get_proc_id_t ompt_get_proc_id;
 static ompt_enumerate_states_t ompt_enumerate_states;
 static ompt_enumerate_mutex_impls_t ompt_enumerate_mutex_impls;
 
+
+__thread FILE * taskgraph = NULL;
+
 static void print_ids(int level)
 {
     int task_type, thread_num;
@@ -135,7 +138,7 @@ on_ompt_callback_sync_region(
     ompt_trace_record_t * parallel_record = task_data->ptr;
 #endif
 
-    ompt_trace_record_t *record;
+    ompt_trace_record_t *record;  //record pointer appears, segmentation fault occurs
     switch(endpoint)
     {
         case ompt_scope_begin: {
@@ -172,7 +175,10 @@ on_ompt_callback_sync_region(
                 }
                 case ompt_sync_region_taskwait:
 #ifdef OMPT_TRACING_SUPPORT
-                    record->kind = ompt_sync_region_taskwait;
+                    ompt_lexgion_t * lgp = ompt_lexgion_begin(emap, ompt_callback_sync_region, codeptr_ra);
+                    ompt_trace_record_t * record = add_trace_record_begin(emap, ompt_callback_sync_region, NULL, lgp, task_data->ptr, parallel_data->ptr);
+                    tribute_record_lexgion(lgp, record);
+                    record->kind = ompt_sync_region_taskwait;  //segmentation fault point!!
 #endif
                     break;
                 case ompt_sync_region_taskgroup:
@@ -207,7 +213,9 @@ on_ompt_callback_sync_region(
                 }
                 case ompt_sync_region_taskwait:
 #ifdef OMPT_TRACING_SUPPORT
-                    record->kind = ompt_sync_region_taskwait;
+                    pop_lexgion(emap);
+
+                    //record->kind = ompt_sync_region_taskwait;
 #endif
                     break;
                 case ompt_sync_region_taskgroup:
@@ -269,7 +277,7 @@ on_ompt_callback_sync_region_wait(
                 }
                 case ompt_sync_region_taskwait:
 #ifdef OMPT_TRACING_SUPPORT
-                    record->kind = ompt_sync_region_taskwait;
+                    //record->kind = ompt_sync_region_taskwait;
 #endif
                     break;
                 case ompt_sync_region_taskgroup:
@@ -305,7 +313,7 @@ on_ompt_callback_sync_region_wait(
                 }
                 case ompt_sync_region_taskwait:
 #ifdef OMPT_TRACING_SUPPORT
-                    record->kind = ompt_sync_region_taskwait;
+                    //record->kind = ompt_sync_region_taskwait;
 #endif
                     break;
                 case ompt_sync_region_taskgroup:
@@ -851,7 +859,12 @@ on_ompt_callback_implicit_task(
              * reasons, e.g. data racing if adding the record to the list, etc */
 #else
 #endif
-            //printf("%" PRIu64 ": ompt_event_implicit_task_begin: parallel_id=%" PRIu64 ", task_id=%" PRIu64 ", team_size=%" PRIu32 ", thread_num=%" PRIu32 "\n", ompt_get_thread_data()->value, parallel_data->value, task_data->value, team_size, thread_num);
+            printf("%" PRIu64 ": ompt_event_implicit_task_begin: parallel_id=%" PRIu64 ", task_id=%" PRIu64 ", team_size=%" PRIu32 ", thread_num=%" PRIu32 "\n", ompt_get_thread_data()->value, parallel_data->value, task_data->value, team_size, thread_num);
+            fprintf(taskgraph, "Master_T -> Task%" PRIu64 " [arrowhead=none, weight=5]\n", task_data->value); //kkg
+            fprintf(taskgraph, "Task%" PRIu64 " [style=\"filled\" fillcolor=\"#00BFFF\"]\n", task_data->value); //kkg
+            //fprintf(taskgraph, "{ rank=same;");
+            //fprintf(taskgraph, "%" PRIu64 ";", task_data->value);
+            //fprintf(taskgraph, " }\n");
             break;
         case ompt_scope_end:
             if(flags & ompt_task_initial){
@@ -869,7 +882,8 @@ on_ompt_callback_implicit_task(
              */
             record = add_trace_record_end(emap, ompt_callback_implicit_task, NULL);
 #endif
-            //printf("%" PRIu64 ": ompt_event_implicit_task_end: parallel_id=%" PRIu64 ", task_id=%" PRIu64 ", team_size=%" PRIu32 ", thread_num=%" PRIu32 "\n", ompt_get_thread_data()->value, (parallel_data)?parallel_data->value:0, task_data->value, team_size, thread_num);
+            printf("%" PRIu64 ": ompt_event_implicit_task_end: parallel_id=%" PRIu64 ", task_id=%" PRIu64 ", team_size=%" PRIu32 ", thread_num=%" PRIu32 "\n", ompt_get_thread_data()->value, (parallel_data)?parallel_data->value:0, task_data->value, team_size, thread_num);
+            fprintf(taskgraph, "Task%" PRIu64 " -> Master_TE [label=\"implicit_task_end\", color=red, weight=5]\n", task_data->value);//kkg
             break;
     }
 }
@@ -903,7 +917,7 @@ on_ompt_callback_task_create(
                                                                            parent_task_frame, NULL, NULL, NULL);
 #endif
     } else {
-        ompt_lexgion_t * lgp = ompt_lexgion_begin(emap, ompt_callback_task_create, codeptr_ra);
+        ompt_lexgion_t * lgp = ompt_lexgion_begin(emap, ompt_callback_task_create, codeptr_ra); //!!
 #ifdef OMPT_TRACING_SUPPORT
         ompt_trace_record_t * record = add_trace_record_begin(emap, ompt_callback_task_create, parent_task_frame, lgp,
                                                               parent_task_data->ptr, parallel_data->ptr);
@@ -918,8 +932,10 @@ on_ompt_callback_task_create(
       parent_task_frame ? parent_task_frame->exit_frame.ptr : NULL,
       parent_task_frame ? parent_task_frame->enter_frame.ptr : NULL,
       new_task_data->value, codeptr_ra, buffer, type,
-      has_dependences ? "yes" : "no");		 
-		    
+      has_dependences ? "yes" : "no");	
+      
+    fprintf(taskgraph, "Task%" PRIu64 "-> Task%" PRIu64 " [weight=3, label=\"task_create\"]\n",  parent_task_data ? parent_task_data->value : 0, new_task_data->value); //kkg
+    
 		    
 }
 
@@ -936,6 +952,8 @@ on_ompt_callback_task_schedule(
          ompt_get_thread_data()->value, first_task_data->value,
          (second_task_data ? second_task_data->value : -1),
          ompt_task_status_t_values[prior_task_status], prior_task_status);
+        fprintf(taskgraph, "Task%" PRIu64 "-> Task%" PRIu64 "[weight=3, label=\"switch to\", style=dashed]\n",  first_task_data->value, (second_task_data ? second_task_data->value : -1)); //kkg
+
   if (prior_task_status == ompt_task_complete ||
       prior_task_status == ompt_task_late_fulfill ||
       prior_task_status == ompt_taskwait_complete) {
@@ -998,7 +1016,17 @@ on_ompt_callback_thread_begin(
     thread_data->ptr = record;
 #else
     thread_data->ptr = lgp;
-#endif
+#endif 
+    
+    char filename[100];
+    sprintf(filename, "taskgraph_%d.dot", thread_id); //kkg
+
+    //printf("Thread %d writing to: %s\n", thread_id, filename);
+
+    taskgraph = fopen(filename, "w");
+    //fprintf(taskgraph, "digraph taskgraph {\n" );
+    fflush(taskgraph);
+
     //printf("Thread: %d thread begin\n", thread_id);
     ompt_measure_init(&emap->thread_total);
     ompt_measure(&emap->thread_total);
@@ -1016,6 +1044,8 @@ on_ompt_callback_thread_end(
     //printf("Thread: %d thread end, record: %d\n", thread_id, record->record_id);
 #endif
     pop_lexgion(emap);
+    //fprintf(taskgraph, "}");//kkg
+    fclose(taskgraph);//kkg
 
 //    fini_thread_event_map(thread_id);
     ompt_measure_consume(&emap->thread_total);
@@ -1127,6 +1157,15 @@ int ompt_initialize(
     ompt_measure_init(&total_consumed);
     ompt_measure(&total_consumed);
 
+    //if (taskgraph == NULL) {
+        /*taskgraph = fopen("taskgraph.dot", "w");
+        fprintf(taskgraph, "digraph taskgraph {\n");
+        fprintf(taskgraph, "graph [nodesep=1, ranksep=1, rankdir=TB];\n\n");
+        fprintf(taskgraph, "Main_T [shape=box]\n");
+        fprintf(taskgraph, "Main_TE [shape=box]\n"); //kkg
+        */
+    //}
+
 //    printf("0: NULL_POINTER=%p\n", (void*)NULL);
 //    printf("omptool initialized\n");
 
@@ -1143,6 +1182,7 @@ void ompt_finalize(ompt_data_t *tool_data) {
     printf("                        | ");
     ompt_measure_print(&total_consumed, NULL);
     printf("==============================================================================================\n");
+   
 
 //    int thread_id = get_global_thread_num();
     thread_event_map_t *emap = get_event_map(0);
@@ -1152,6 +1192,8 @@ void ompt_finalize(ompt_data_t *tool_data) {
     ompt_event_maps_to_graphml(event_maps);
 #endif
 #endif
+
+
 }
 
 #ifdef __cplusplus

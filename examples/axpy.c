@@ -90,7 +90,7 @@ int main(int argc, char *argv[]) {
     printf("------------------------------------------------------------------------------------------------------\n");
     printf("Performance:\t\t\tRuntime (ms)\t MFLOPS \t\tError (compared to base)\n");
     printf("------------------------------------------------------------------------------------------------------\n");
-     printf("axpy_omp_parallel_for:\t\t%4f\t%4f \t\t%g\n", elapsed_omp_parallel_for * 1.0e3, (2.0 * N) / (1.0e6 * elapsed_omp_parallel_for), check(Y_base,Y_parallel, N));
+    printf("axpy_omp_parallel_for:\t\t%4f\t%4f \t\t%g\n", elapsed_omp_parallel_for * 1.0e3, (2.0 * N) / (1.0e6 * elapsed_omp_parallel_for), check(Y_base,Y_parallel, N));
 
     //printf("\tElapsed time:\t%4f(ms)\n\n", elapsed_omp_parallel_for * 1.0e3);
     sleep(1); 

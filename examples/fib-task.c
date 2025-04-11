@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdlib.h> 
 #include <omp.h>
 int fib(int n)
 {
@@ -18,12 +19,10 @@ int fib(int n)
     }
 }
 
-int main()
+int main(int argc, char*argv[])
 {
-  int n = 10;
-
-  omp_set_dynamic(0);
-  omp_set_num_threads(4);
+  int n = 2;
+  if (argc > 1) n = atoi(argv[1]);
 
   #pragma omp parallel shared(n)
   {

@@ -24,6 +24,7 @@ runjacobi: jacobi
 
 runfib: fib
 	LD_PRELOAD=${OMP_LIB_PATH}/libomp.so:${OMPTRACE_LIB} ./fib
+	./merge_taskgraph.sh
 
 clean:
 	rm axpyclang axpyclang.objdump core jacobi jacobi.objdump fib fib.objdump

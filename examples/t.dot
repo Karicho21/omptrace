@@ -1,0 +1,82 @@
+/*
+
+digraph taskgraph {
+
+    //T = thread
+    //j = job
+    //c = child
+
+    graph [nodesep=1, ranksep=1, rankdir=TB]; 
+
+    Main_T [shape=box]
+    Main_TE [shape=box]
+    Main_T -> {j1, j2, j3, j4} [arrowhead=none]
+    
+
+    j1 -> c1 [headlabel="switch to", labeldistance=7.5, labelangle=15, style=dashed]
+
+   
+    j2 -> c2 [weight=3, label="task_create", arrowhead=none]
+    j2 -> c1 [weight=3, label="task_create", arrowhead=none]
+    j2 -> c2 [weight=2, label="switch to", style=dashed]
+    c1 -> x3 [label="complete", style=dashed]
+    c2 -> x4 [label="complete", style=dashed]
+    //x1 -> x3 [weight=3, constraint=true]
+    //x2 -> x4 [weight=3, constraint=true]
+    j3 -> x5 [weight=3]
+    j4 -> x6 [weight=3]
+    x3 -> Main_TE [arrowhead=none];
+    x4 -> Main_TE [arrowhead=none];
+    x5 -> Main_TE [arrowhead=none];
+    x6 -> Main_TE [arrowhead=none];
+
+
+    j1 [style="filled" fillcolor="#00BFFF", label="IT0"]
+    j2 [style="filled" fillcolor="#00BFFF", label="IT1"]
+    j3 [style="filled" fillcolor="#00BFFF", label="IT2"]
+    j4 [style="filled" fillcolor="#00BFFF", label="IT3"]
+
+  
+   
+    //x1 [style="filled" fillcolor="#00BFFF", label="IT0", xlabel="task_end c1"]
+    //x2 [style="filled" fillcolor="#00BFFF", label="IT1", xlabel="task_end c2"]
+    x3 [shape=point, xlabel="implicit_task_end"]
+    x4 [shape=point, xlabel="implicit_task_end"]
+    x5 [shape=point, xlabel="implicit_task_end"]
+    x6 [shape=point, xlabel="implicit_task_end"]
+
+    { rank=same; x5; x6; x3; x4; }
+    { rank=same; j1; j2; j3; j4; }
+    { rank=same; c1; c2 }
+
+    c1 [style="filled" fillcolor="#FAF884"]
+    c2 [style="filled" fillcolor="#FAF884"]
+
+
+    // to enhance the visual
+    //x1 -> x3 [weight=3, style=invis]
+    //x2 -> x4 [weight=4, style=invis]
+    //j2 -> x4 [weight=4, style=invis]
+
+
+}
+
+
+*/
+
+
+digraph g {
+    Master_thread [shape=box]
+    Master_thread_merged [shape=box]
+    Thread1 [style="filled" fillcolor="#00BFFF"]
+    Thread2 [style="filled" fillcolor="#00BFFF"]
+    Thread3 [style="filled" fillcolor="#00BFFF"]
+    Thread4 [style="filled" fillcolor="#00BFFF"]
+
+    Master_thread -> {Thread1, Thread2, Thread3, Thread4}
+    Thread1 -> Master_thread_merged
+    Thread2 -> Master_thread_merged
+    Thread3 -> Master_thread_merged
+    Thread4 -> Master_thread_merged
+
+}

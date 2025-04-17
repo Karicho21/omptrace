@@ -1,0 +1,70 @@
+/* starting */
+
+- gdb ./fib
+- run 
+- bt     (backtrace: you can see the address memory of the stack and what happens til the core dumps)
+- print record (Shows where segmentation fault happens)
+- break filename.c:linenmber (reate breakpoint ex:  break fib-task.c:31) then "run" again
+- step (execute the rpogram step by step)
+- continue (after hitting the breakpoint, code will stop. if you want it to keep going type this)
+- grep -r ompt_callback_task_create .. (look up where ompt_callback_task_create is across )
+- xdot filename.dot (execute the file and visualize)
+
+
+/* Goal */
+- to visualize the task creating process and schedile process automatically using fprintf and fopen
+- make new file to handle the imported data file and visualize
+- make simple main method to ...?
+
+
+/*  NOTES */
+
+- in ompt_callback.c pointer is not pointing anywehre and that is the reason why the core dumps happens (L138)
+
+- right now L175 and L168 is null pointer, so record variable is not intialized
+
+- L175 invoke taskwait(), in fib-task.c L16, taskwait() is called (see #3 after bt command!)
+
+- taskwait (#2) calls sync_region (#0) the call L175 and segmentation fault, then L139 switch(endpoint), L141 scope_begin. at this point the record variable is not intialized at all
+
+- how to initialize record? Look at L146 ~ L168. L152 intializes record and L138 creates trace record.
+
+- L162 (ompt_callback.c) add_trace_record_begin() exists in L83 ompreace.c
+
+- fib_task.c L10&11, L13&14, L16&17, L28-32 are REGION
+
+- #pragma means it is a lexigon, identifies a portion of the code that opens omp? //check with prof
+    -when this opens, intializes. Read the commet on the omptrace.handy
+
+- every region has parallel region. max region is 5
+
+- in fib_task.c L29-32 is a loop so creates instance of the same region (recursive, call fb fib fib fib...). sma eregion can have multiple record and omptrace.h L111 is a counter to keep up with the record the code creates. L95 is a pointer for the most recent one it created.
+        - L57 *lgp  is the record
+        - when one region gets called multiple time and creates many record, L62 *next links all of the record that belongs to the same region.
+
+- L53 endpoint a point where regioin ends (L32 in fib_task.c)
+
+
+- L104 ~ in axpy.c will call L639 const ompt_frame_t *parent_task_frame
+- parallel_begin() in L637 if lexgion has not been created before it creates it,  if already exist then it will go find the region and return the pointer of the region (see L199 omptrace.c )
+
+- I need to make record for sync_region_wait
+
+- L256 omptrace.c has the printf statements for the "makr runfib"
+
+
+- i need to modify the code where taskwait is called!!
+    #pragma omp task shared(i) firstprivate(n) calls for the "on_ompt_callback_task_create()" L883 ompt_callback.c
+
+    /*ompt_lexgion_t * lgp = ompt_lexgion_begin(emap, ompt_callback_task_create, codeptr_ra); //!!
+#ifdef OMPT_TRACING_SUPPORT
+        ompt_trace_record_t * record = add_trace_record_begin(emap, ompt_callback_task_create, parent_task_frame, lgp,
+                                                              parent_task_data->ptr, parallel_data->ptr);
+        tribute_record_lexgion(lgp, record);
+#endif */ from L911 needs to go to taskwait (L176)
+
+
+
+
+
+

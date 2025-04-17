@@ -859,7 +859,7 @@ on_ompt_callback_implicit_task(
              * reasons, e.g. data racing if adding the record to the list, etc */
 #else
 #endif
-            printf("%" PRIu64 ": ompt_event_implicit_task_begin: parallel_id=%" PRIu64 ", task_id=%" PRIu64 ", team_size=%" PRIu32 ", thread_num=%" PRIu32 "\n", ompt_get_thread_data()->value, parallel_data->value, task_data->value, team_size, thread_num);
+            printf("%" PRIu64 ": ompt_event_implicit_task_begin: parallel_id=%" PRIu64 ", task_id=%" PRIu64 ", team_size=%" PRIu32 ", thread_num=%" PRIu32 ", global thread_id=%" PRIu32 "\n", ompt_get_thread_data()->value, parallel_data->value, task_data->value, team_size, thread_num, thread_id);
             fprintf(taskgraph, "Master_T -> Task%" PRIu64 " [arrowhead=none, weight=5]\n", task_data->value); //kkg
             fprintf(taskgraph, "Task%" PRIu64 " [style=\"filled\" fillcolor=\"#00BFFF\"]\n", task_data->value); //kkg
             //fprintf(taskgraph, "{ rank=same;");

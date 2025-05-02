@@ -1,0 +1,30 @@
+    <node id="n134224852025520">
+      <data key="d0">
+        <y:ShapeNode>
+          <y:Geometry height="30.0" width="150.0" y="200.0"/>
+          <y:Fill color="#77DD77" transparent="false"/>
+          <y:NodeLabel alignment="center" verticalTextPosition="center" horizontalTextPosition="center" textAlignment="center">Task 134224852025520</y:NodeLabel>
+        </y:ShapeNode>
+      </data>
+    </node>
+
+    <edge id="e00-134224852025520" source="n00" target="n134224852025520">
+      <data key="d1">
+        <y:PolyLineEdge>
+          <y:LineStyle color="blue" width="2.0" type="solid"/>
+           <y:Arrows source="none" target="delta"/>
+          <y:EdgeLabel>implicit_task_begin</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+    <edge id="e134224852025520-01" source="n134224852025520" target="n01">
+      <data key="d1">
+        <y:PolyLineEdge>
+          <y:LineStyle color="red" width="1.0" type="solid"/>
+           <y:Arrows source="none" target="delta"/>
+          <y:EdgeLabel>implicit_task_end</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:y="http://www.yworks.com/xml/graphml"
+         xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns
+         http://www.yworks.com/xml/schema/graphml/1.1/ygraphml.xsd"
+         xmlns:yed="http://www.yworks.com/xml/yed/3">
+  <key id="d0" for="node" yfiles.type="nodegraphics"/>
+  <key id="d1" for="edge" yfiles.type="edgegraphics"/>
+
+  <graph id="G" edgedefault="directed">
+    <!-- Node template -->
+    <node id="Master_T">
+      <data key="d0"><y:ShapeNode><y:Fill color="#FFCC00" transparent="false"/><y:NodeLabel>Master_T</y:NodeLabel></y:ShapeNode></data>
+    </node>
+    <node id="Master_TE">
+      <data key="d0"><y:ShapeNode><y:Fill color="#FFCC00" transparent="false"/><y:NodeLabel>Master_TE</y:NodeLabel></y:ShapeNode></data>
+    </node>
+
+    <!-- Example for blue-filled task node -->
+    <node id="Task128772003070288">
+      <data key="d0">
+        <y:ShapeNode>
+          <y:Fill color="#00BFFF" transparent="false"/>
+          <y:NodeLabel>Task128772003070288</y:NodeLabel>
+        </y:ShapeNode>
+      </data>
+    </node>
+
+    <!-- Add all other nodes below similarly... -->
+
+    <!-- Edge: Master_T -> Task128772003070288 -->
+    <edge id="e1" source="Master_T" target="Task128772003070288">
+      <data key="d1">
+        <y:PolyLineEdge>
+          <y:Arrows source="none" target="standard"/>
+          <y:EdgeLabel>weight=5</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+    <!-- Edge: Task128772003070288 -> Task562949953421314 [dashed, label "switch to"] -->
+    <edge id="e2" source="Task128772003070288" target="Task562949953421314">
+      <data key="d1">
+        <y:PolyLineEdge>
+          <y:LineStyle type="dashed" width="1.0" color="#000000"/>
+          <y:EdgeLabel>switch to</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+    <!-- Edge: Task128772003070288 -> Master_TE [red, implicit_task_end] -->
+    <edge id="e3" source="Task128772003070288" target="Master_TE">
+      <data key="d1">
+        <y:PolyLineEdge>
+          <y:LineStyle color="#FF0000" width="1.5" type="line"/>
+          <y:EdgeLabel>implicit_task_end</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+    <!-- Add the rest of the edges/nodes in the same pattern... -->
+
+  </graph>
+</graphml>

@@ -326,7 +326,7 @@ Disassembly of section .text:
     1418:	c7 45 fc 00 00 00 00 	movl   $0x0,-0x4(%rbp)
     141f:	89 7d f8             	mov    %edi,-0x8(%rbp)
     1422:	48 89 75 f0          	mov    %rsi,-0x10(%rbp)
-    1426:	c7 45 ec 02 00 00 00 	movl   $0x2,-0x14(%rbp)
+    1426:	c7 45 ec 04 00 00 00 	movl   $0x4,-0x14(%rbp)
     142d:	83 7d f8 01          	cmpl   $0x1,-0x8(%rbp)
     1431:	0f 8e 10 00 00 00    	jle    1447 <main+0x37>
     1437:	48 8b 45 f0          	mov    -0x10(%rbp),%rax

@@ -1,0 +1,50 @@
+    <node id="n134233173524656">
+      <data key="d0">
+        <y:ShapeNode>
+          <y:Geometry height="30.0" width="150.0" y="200.0"/>
+          <y:Fill color="#77DD77" transparent="false"/>
+          <y:NodeLabel alignment="center" verticalTextPosition="center" horizontalTextPosition="center" textAlignment="center">Task 134233173524656</y:NodeLabel>
+        </y:ShapeNode>
+      </data>
+    </node>
+
+    <edge id="e00-134233173524656" source="n00" target="n134233173524656">
+      <data key="d1">
+        <y:PolyLineEdge>
+          <y:LineStyle color="blue" width="2.0" type="solid"/>
+           <y:Arrows source="none" target="delta"/>
+          <y:EdgeLabel>implicit_task_begin</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+    <edge id="e134233173524656-2251799813685251 " source="n134233173524656" target="n2251799813685251">
+      <data key="d1">
+        <y:PolyLineEdge>
+           <y:LineStyle color="black" width="1.0" type="dashed"/>
+           <y:Arrows source="none" target="delta"/>
+          <y:EdgeLabel>switch to</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+    <edge id="e2251799813685251-134233173524656 " source="n2251799813685251" target="n134233173524656">
+      <data key="d1">
+        <y:PolyLineEdge>
+           <y:LineStyle color="black" width="1.0" type="dashed"/>
+           <y:Arrows source="none" target="delta"/>
+          <y:EdgeLabel>switch to</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+    <edge id="e134233173524656-01" source="n134233173524656" target="n01">
+      <data key="d1">
+        <y:PolyLineEdge>
+          <y:LineStyle color="red" width="1.0" type="solid"/>
+           <y:Arrows source="none" target="delta"/>
+          <y:EdgeLabel>implicit_task_end</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+

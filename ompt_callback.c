@@ -97,6 +97,7 @@ static ompt_enumerate_mutex_impls_t ompt_enumerate_mutex_impls;
 
 
 __thread FILE * taskgraph = NULL;
+__thread FILE * taskgraphml = NULL; //kkg
 
 static void print_ids(int level)
 {
@@ -862,9 +863,28 @@ on_ompt_callback_implicit_task(
             printf("%" PRIu64 ": ompt_event_implicit_task_begin: parallel_id=%" PRIu64 ", task_id=%" PRIu64 ", team_size=%" PRIu32 ", thread_num=%" PRIu32 ", global thread_id=%" PRIu32 "\n", ompt_get_thread_data()->value, parallel_data->value, task_data->value, team_size, thread_num, thread_id);
             fprintf(taskgraph, "Master_T -> Task%" PRIu64 " [arrowhead=none, weight=5]\n", task_data->value); //kkg
             fprintf(taskgraph, "Task%" PRIu64 " [style=\"filled\" fillcolor=\"#00BFFF\"]\n", task_data->value); //kkg
-            //fprintf(taskgraph, "{ rank=same;");
-            //fprintf(taskgraph, "%" PRIu64 ";", task_data->value);
-            //fprintf(taskgraph, " }\n");
+
+            //creates node
+            fprintf(taskgraphml, "    <node id=\"n%" PRIu64"\">\n", task_data->value);
+            fprintf(taskgraphml, "      <data key=\"d0\">\n");
+            fprintf(taskgraphml, "        <y:ShapeNode>\n"); 
+            fprintf(taskgraphml, "          <y:Geometry height=\"30.0\" width=\"150.0\" y=\"200.0\"/>\n");
+            fprintf(taskgraphml, "          <y:Fill color=\"#77DD77\" transparent=\"false\"/>\n");
+            fprintf(taskgraphml, "          <y:NodeLabel alignment=\"center\" verticalTextPosition=\"center\" horizontalTextPosition=\"center\" textAlignment=\"center\">Task %" PRIu64 "</y:NodeLabel>\n", task_data->value);
+            fprintf(taskgraphml, "        </y:ShapeNode>\n");
+            fprintf(taskgraphml, "      </data>\n");
+            fprintf(taskgraphml, "    </node>\n\n");
+
+            fprintf(taskgraphml, "    <edge id=\"e00-%" PRIu64 "\" source=\"n00\" target=\"n%" PRIu64 "\">\n", task_data->value, task_data->value);
+            fprintf(taskgraphml, "      <data key=\"d1\">\n");
+            fprintf(taskgraphml, "        <y:PolyLineEdge>\n");
+            fprintf(taskgraphml, "          <y:LineStyle color=\"blue\" width=\"2.0\" type=\"solid\"/>\n");
+            fprintf(taskgraphml, "           <y:Arrows source=\"none\" target=\"delta\"/>\n");
+            fprintf(taskgraphml, "          <y:EdgeLabel>implicit_task_begin</y:EdgeLabel>\n");
+            fprintf(taskgraphml, "        </y:PolyLineEdge>\n");
+            fprintf(taskgraphml, "      </data>\n");
+            fprintf(taskgraphml, "    </edge>\n\n");	//kkg
+
             break;
         case ompt_scope_end:
             if(flags & ompt_task_initial){
@@ -884,6 +904,18 @@ on_ompt_callback_implicit_task(
 #endif
             printf("%" PRIu64 ": ompt_event_implicit_task_end: parallel_id=%" PRIu64 ", task_id=%" PRIu64 ", team_size=%" PRIu32 ", thread_num=%" PRIu32 "\n", ompt_get_thread_data()->value, (parallel_data)?parallel_data->value:0, task_data->value, team_size, thread_num);
             fprintf(taskgraph, "Task%" PRIu64 " -> Master_TE [label=\"implicit_task_end\", color=red, weight=5]\n", task_data->value);//kkg
+            
+            //connecting implicit task to master_te
+            fprintf(taskgraphml, "    <edge id=\"e%" PRIu64 "-01\" source=\"n%" PRIu64 "\" target=\"n01\">\n", task_data->value, task_data->value);
+            fprintf(taskgraphml, "      <data key=\"d1\">\n");
+            fprintf(taskgraphml, "        <y:PolyLineEdge>\n");
+            fprintf(taskgraphml, "          <y:LineStyle color=\"red\" width=\"1.0\" type=\"solid\"/>\n");
+            fprintf(taskgraphml, "           <y:Arrows source=\"none\" target=\"delta\"/>\n");
+            fprintf(taskgraphml, "          <y:EdgeLabel>implicit_task_end</y:EdgeLabel>\n");
+            fprintf(taskgraphml, "        </y:PolyLineEdge>\n");
+            fprintf(taskgraphml, "      </data>\n");
+            fprintf(taskgraphml, "    </edge>\n\n"); //kkg
+            
             break;
     }
 }
@@ -928,15 +960,35 @@ on_ompt_callback_task_create(
 
     char buffer[2048];
     format_task_type(type, buffer);
-    printf("%" PRIu64 ": ompt_event_task_create: parent_task_id=%" PRIu64 ", parent_task_frame.exit=%p, parent_task_frame.reenter=%p, new_task_id=%" PRIu64 ", parallel_function=%p, task_type=%s=%d, has_dependences=%s\n", ompt_get_thread_data()->value,       parent_task_data ? parent_task_data->value : 0,
+    printf("%" PRIu64 ": ompt_event_task_create: parent_task_id=%" PRIu64 ", parent_task_frame.exit=%p, parent_task_frame.reenter=%p, new_task_id=%" PRIu64 ", parallel_function=%p, task_type=%s=%d, has_dependences=%s\n", ompt_get_thread_data()->value, parent_task_data ? parent_task_data->value : 0,
       parent_task_frame ? parent_task_frame->exit_frame.ptr : NULL,
       parent_task_frame ? parent_task_frame->enter_frame.ptr : NULL,
       new_task_data->value, codeptr_ra, buffer, type,
-      has_dependences ? "yes" : "no");	
+      has_dependences ? "yes" : "no");
+    
+    //fprintf(taskgraphml, "  <key id=\"d%" PRIu64"\" for=\"node\" yfiles.type=\"nodegraphics\"/>\n",new_task_data->value);
+    fprintf(taskgraphml, "    <node id=\"n%" PRIu64"\">\n", new_task_data->value);
+    fprintf(taskgraphml, "      <data key=\"d0\">\n");
+    fprintf(taskgraphml, "        <y:ShapeNode>\n"); 
+    fprintf(taskgraphml, "          <y:Fill color=\"#00BFFF\" transparent=\"false\"/>\n");
+    fprintf(taskgraphml, "          <y:NodeLabel>Task %" PRIu64 "</y:NodeLabel>\n", new_task_data->value);
+    fprintf(taskgraphml, "          <y:Geometry height=\"30.0\" width=\"150.0\"/>\n");
+    fprintf(taskgraphml, "        </y:ShapeNode>\n");
+    fprintf(taskgraphml, "      </data>\n");
+    fprintf(taskgraphml, "    </node>\n\n");
       
     fprintf(taskgraph, "Task%" PRIu64 "-> Task%" PRIu64 " [weight=3, label=\"task_create\"]\n",  parent_task_data ? parent_task_data->value : 0, new_task_data->value); //kkg
-    
-		    
+
+    //fprintf(taskgraphml, "  <key id=\"d%" PRIu64 "-%"PRIu64"\" for=\"edge\" yfiles.type=\"edgegraphics\"/>\n", parent_task_data ? parent_task_data->value : 0, new_task_data->value);
+    fprintf(taskgraphml, "    <edge id=\"e%" PRIu64 "-%"PRIu64"\" source=\"n%"PRIu64"\" target=\"n%" PRIu64 "\">\n", parent_task_data ? parent_task_data->value : 0, new_task_data->value, parent_task_data ? parent_task_data->value : 0, new_task_data->value);
+	fprintf(taskgraphml, "        <data key=\"d1\">\n");
+    fprintf(taskgraphml, "           <y:PolyLineEdge>\n");
+    fprintf(taskgraphml, "           <y:LineStyle color=\"black\" width=\"1.0\" type=\"solid\"/>\n");
+    fprintf(taskgraphml, "           <y:Arrows source=\"none\" target=\"delta\"/>\n");
+    fprintf(taskgraphml, "          <y:EdgeLabel>task_create</y:EdgeLabel>\n");
+    fprintf(taskgraphml, "        </y:PolyLineEdge>\n");
+    fprintf(taskgraphml, "      </data>\n");
+    fprintf(taskgraphml, "    </edge>\n\n");		    //kkg
 }
 
 
@@ -953,6 +1005,17 @@ on_ompt_callback_task_schedule(
          (second_task_data ? second_task_data->value : -1),
          ompt_task_status_t_values[prior_task_status], prior_task_status);
         fprintf(taskgraph, "Task%" PRIu64 "-> Task%" PRIu64 "[weight=3, label=\"switch to\", style=dashed]\n",  first_task_data->value, (second_task_data ? second_task_data->value : -1)); //kkg
+
+        //fprintf(taskgraphml, "  <key id=\"d%" PRIu64 "-%"PRIu64"\" for=\"edge\" yfiles.type=\"edgegraphics\"/>\n", first_task_data->value, (second_task_data ? second_task_data->value : -1));
+        fprintf(taskgraphml, "    <edge id=\"e%" PRIu64"-%" PRIu64 " \" source=\"n%" PRIu64 "\" target=\"n%" PRIu64 "\">\n", first_task_data->value, (second_task_data ? second_task_data->value : -1), first_task_data->value, (second_task_data ? second_task_data->value : -1));
+        fprintf(taskgraphml, "      <data key=\"d1\">\n");
+        fprintf(taskgraphml, "        <y:PolyLineEdge>\n ");
+        fprintf(taskgraphml, "          <y:LineStyle color=\"black\" width=\"1.0\" type=\"dashed\"/>\n");
+        fprintf(taskgraphml, "           <y:Arrows source=\"none\" target=\"delta\"/>\n");
+        fprintf(taskgraphml, "          <y:EdgeLabel>switch to</y:EdgeLabel>\n");
+        fprintf(taskgraphml, "        </y:PolyLineEdge>\n");
+        fprintf(taskgraphml, "      </data>\n");
+        fprintf(taskgraphml, "    </edge>\n\n");    //kkg
 
   if (prior_task_status == ompt_task_complete ||
       prior_task_status == ompt_task_late_fulfill ||
@@ -1018,14 +1081,48 @@ on_ompt_callback_thread_begin(
     thread_data->ptr = lgp;
 #endif 
     
-    char filename[100];
+    char filename[100], filenameml[100];
     sprintf(filename, "taskgraph_%d.dot", thread_id); //kkg
+    sprintf(filenameml, "taskgraph_%d.graphml", thread_id); //kkg
 
     //printf("Thread %d writing to: %s\n", thread_id, filename);
 
     taskgraph = fopen(filename, "w");
-    //fprintf(taskgraph, "digraph taskgraph {\n" );
+    taskgraphml = fopen(filenameml, "w");
+
+
+    /*fprintf(taskgraphml, "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" );
+    fprintf(taskgraphml, "<graphml xmlns=\"http://graphml.graphdrawing.org/xmlns\"\n" );
+    fprintf(taskgraphml, "         xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
+    fprintf(taskgraphml, "         xmlns:y=\"http://www.yworks.com/xml/graphml\"\n" );
+    fprintf(taskgraphml, "         xsi:schemaLocation=\"http://graphml.graphdrawing.org/xmlns\n" );
+    fprintf(taskgraphml, "         http://www.yworks.com/xml/schema/graphml/1.1/ygraphml.xsd\"\n" );
+    fprintf(taskgraphml, "         xmlns:yed=\"http://www.yworks.com/xml/yed/3\">\n");
+    fprintf(taskgraphml, "  <key id=\"d0\" for=\"node\" yfiles.type=\"nodegraphics\"/>\n" );
+    fprintf(taskgraphml, "  <key id=\"d1\" for=\"edge\" yfiles.type=\"edgegraphics\"/>\n" );
+    fprintf(taskgraphml, "  <graph id=\"G\" edgedefault=\"directed\">\n\n\n");*/
+
+    //create master_t and master-te node
+    /*fprintf(taskgraphml, "    <node id=\"00\">\n");
+    fprintf(taskgraphml, "      <data key=\"d0\">\n");
+    fprintf(taskgraphml, "        <y:ShapeNode>\n"); 
+    fprintf(taskgraphml, "          <y:Fill color=\"#FFCC00\" transparent=\"false\"/>\n");
+    fprintf(taskgraphml, "          <y:NodeLabel>Master_T</y:NodeLabel>\n");
+    fprintf(taskgraphml, "        </y:ShapeNode>\n");
+    fprintf(taskgraphml, "      </data>\n");
+    fprintf(taskgraphml, "    </node>\n");
+    fprintf(taskgraphml, "    <node id=\"01\">\n");
+    fprintf(taskgraphml, "      <data key=\"d1\">\n");
+    fprintf(taskgraphml, "        <y:ShapeNode>\n"); 
+    fprintf(taskgraphml, "          <y:Fill color=\"#FFCC00\" transparent=\"false\"/>\n");
+    fprintf(taskgraphml, "          <y:NodeLabel>Master_T</y:NodeLabel>\n");
+    fprintf(taskgraphml, "        </y:ShapeNode>\n");
+    fprintf(taskgraphml, "      </data>\n");
+    fprintf(taskgraphml, "    </node>\n");*/
+
     fflush(taskgraph);
+    fflush(taskgraphml);
+
 
     //printf("Thread: %d thread begin\n", thread_id);
     ompt_measure_init(&emap->thread_total);
@@ -1044,8 +1141,8 @@ on_ompt_callback_thread_end(
     //printf("Thread: %d thread end, record: %d\n", thread_id, record->record_id);
 #endif
     pop_lexgion(emap);
-    //fprintf(taskgraph, "}");//kkg
     fclose(taskgraph);//kkg
+    fclose(taskgraphml); //kkg
 
 //    fini_thread_event_map(thread_id);
     ompt_measure_consume(&emap->thread_total);
@@ -1156,15 +1253,6 @@ int ompt_initialize(
     ompt_measure_global_init( );
     ompt_measure_init(&total_consumed);
     ompt_measure(&total_consumed);
-
-    //if (taskgraph == NULL) {
-        /*taskgraph = fopen("taskgraph.dot", "w");
-        fprintf(taskgraph, "digraph taskgraph {\n");
-        fprintf(taskgraph, "graph [nodesep=1, ranksep=1, rankdir=TB];\n\n");
-        fprintf(taskgraph, "Main_T [shape=box]\n");
-        fprintf(taskgraph, "Main_TE [shape=box]\n"); //kkg
-        */
-    //}
 
 //    printf("0: NULL_POINTER=%p\n", (void*)NULL);
 //    printf("omptool initialized\n");

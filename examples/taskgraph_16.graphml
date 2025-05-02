@@ -1,0 +1,110 @@
+    <node id="n134223174303920">
+      <data key="d0">
+        <y:ShapeNode>
+          <y:Geometry height="30.0" width="150.0" y="200.0"/>
+          <y:Fill color="#77DD77" transparent="false"/>
+          <y:NodeLabel alignment="center" verticalTextPosition="center" horizontalTextPosition="center" textAlignment="center">Task 134223174303920</y:NodeLabel>
+        </y:ShapeNode>
+      </data>
+    </node>
+
+    <edge id="e00-134223174303920" source="n00" target="n134223174303920">
+      <data key="d1">
+        <y:PolyLineEdge>
+          <y:LineStyle color="blue" width="2.0" type="solid"/>
+           <y:Arrows source="none" target="delta"/>
+          <y:EdgeLabel>implicit_task_begin</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+    <node id="n562949953421314">
+      <data key="d0">
+        <y:ShapeNode>
+          <y:Fill color="#00BFFF" transparent="false"/>
+          <y:NodeLabel>Task 562949953421314</y:NodeLabel>
+          <y:Geometry height="30.0" width="150.0"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+
+    <edge id="e134223174303920-562949953421314" source="n134223174303920" target="n562949953421314">
+        <data key="d1">
+           <y:PolyLineEdge>
+           <y:LineStyle color="black" width="1.0" type="solid"/>
+           <y:Arrows source="none" target="delta"/>
+          <y:EdgeLabel>task_create</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+    <node id="n562949953421315">
+      <data key="d0">
+        <y:ShapeNode>
+          <y:Fill color="#00BFFF" transparent="false"/>
+          <y:NodeLabel>Task 562949953421315</y:NodeLabel>
+          <y:Geometry height="30.0" width="150.0"/>
+        </y:ShapeNode>
+      </data>
+    </node>
+
+    <edge id="e134223174303920-562949953421315" source="n134223174303920" target="n562949953421315">
+        <data key="d1">
+           <y:PolyLineEdge>
+           <y:LineStyle color="black" width="1.0" type="solid"/>
+           <y:Arrows source="none" target="delta"/>
+          <y:EdgeLabel>task_create</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+    <edge id="e134223174303920-2251799813685250 " source="n134223174303920" target="n2251799813685250">
+      <data key="d1">
+        <y:PolyLineEdge>
+           <y:LineStyle color="black" width="1.0" type="dashed"/>
+           <y:Arrows source="none" target="delta"/>
+          <y:EdgeLabel>switch to</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+    <edge id="e2251799813685250-134223174303920 " source="n2251799813685250" target="n134223174303920">
+      <data key="d1">
+        <y:PolyLineEdge>
+           <y:LineStyle color="black" width="1.0" type="dashed"/>
+           <y:Arrows source="none" target="delta"/>
+          <y:EdgeLabel>switch to</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+    <edge id="e134223174303920-3377699720527875 " source="n134223174303920" target="n3377699720527875">
+      <data key="d1">
+        <y:PolyLineEdge>
+           <y:LineStyle color="black" width="1.0" type="dashed"/>
+           <y:Arrows source="none" target="delta"/>
+          <y:EdgeLabel>switch to</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+    <edge id="e3377699720527875-134223174303920 " source="n3377699720527875" target="n134223174303920">
+      <data key="d1">
+        <y:PolyLineEdge>
+           <y:LineStyle color="black" width="1.0" type="dashed"/>
+           <y:Arrows source="none" target="delta"/>
+          <y:EdgeLabel>switch to</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
+    <edge id="e134223174303920-01" source="n134223174303920" target="n01">
+      <data key="d1">
+        <y:PolyLineEdge>
+          <y:LineStyle color="red" width="1.0" type="solid"/>
+           <y:Arrows source="none" target="delta"/>
+          <y:EdgeLabel>implicit_task_end</y:EdgeLabel>
+        </y:PolyLineEdge>
+      </data>
+    </edge>
+
